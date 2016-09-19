@@ -1,0 +1,10 @@
+/* Empty. Add your own CSS if you like */
+
+
+#boxShadow {
+    width: 100%;
+    padding: 30px 0px;
+    text-align: center;
+    border: 1px solid #999; color: #333;
+    border-radius: 4px;
+}

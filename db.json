@@ -1,0 +1,23 @@
+{
+	"preguntas": [{
+		"idPreg": "001",
+		"preg": "¿Cual de las siguientes no es una partícula subatómica?",
+		"respOk": "op3",
+		"opciones": {
+			"op1": "Protón",
+			"op2": "Neutrón",
+			"op3": "Bombón",
+			"op4": "Electrón"
+		}
+	}, {
+		"idPreg": "002",
+		"preg": "¿En que momento del año el hemosferio norte esta inclinado hacia el sol y, por tanto, el dia es mas largo y la noche mas corta?",
+		"respOk": "op2",
+		"opciones": {
+			"op1": "Equinoccio de primavera",
+			"op2": "Equinoccio de otoño",
+			"op3": "Equinoccio de verano",
+			"op4": "Equinoccio inverno"
+		}
+	}]
+}

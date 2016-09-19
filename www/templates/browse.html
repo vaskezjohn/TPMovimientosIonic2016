@@ -1,0 +1,23 @@
+<ion-view view-title="Browse">
+  <ion-content>
+           
+  				  <div ng-repeat="item in object" ng-show="preg" >
+					  <div id='boxShadow'>{{item.preg}}</div>
+					  <div ng-style="section">
+					    <div ng-repeat="op in item.opciones">
+					      <button  class="button button-outline button-full button-positive" type="button" ng-click="respuesta(item.respOk)"> {{op}} </button>
+					    </div>
+					  </div>			
+                    </slide> 
+                  </div>                  
+
+  
+   </ion-content>
+</ion-view>
+
+
+
+      
+
+
+
