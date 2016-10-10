@@ -64,25 +64,64 @@ angular.module('starter.controllers', [])
 })
 
 
-.controller('BrowseCtrl', function($scope, $stateParams,$firebaseArray) {
-$scope.preg=true;
-  var ref = new Firebase('https://trivia-86f1c.firebaseio.com/preguntas/');
-  $scope.object = $firebaseArray(ref); 
+.controller('BrowseCtrl', function($scope, $stateParams,$timeout,$ionicPlatform) {
+  $scope.objecto;
+  var cantPreg=0;
+  var preg=1;
+  var ref = new Firebase('https://trivia-86f1c.firebaseio.com/preguntas');
+
+  $ionicPlatform.ready(function() {
+    ionic.Platform.fullScreen();
+  });
+
+  ref.once("value", function(snapshot) {
+  cantPreg = snapshot.numChildren();
+  });
+
+  CargoPregunta(preg);
+
+  
 
   $scope.respuesta=function(res){
-      console.log(res);
-      $scope.preg=false;
+    if ($scope.objecto.respOk==res)
+    {
+      console.log(preg);
+      if(cantPreg>preg){
+         preg+=1;
+         CargoPregunta(preg); 
+      }else{
+        preg=1;
+        console.log(preg);
+        CargoPregunta(preg);  
+      }
+     
+    //  console.log(cantPreg + " - " + preg);
+       
     }
+  }
 
-    
+   function CargoPregunta(nroPreg){
+     ref.orderByChild("idPreg").equalTo("00"+nroPreg)
+          .on("child_added", function(snapshot) {
+
+              // $scope.$apply(function() {
+              //     // console.info(snapshot.val());
+              //      $scope.objecto = snapshot.val();
+              // });
+
+                $timeout(function() {
+                   $scope.objecto = snapshot.val();
+                }, 0);
 
 
-  // $scope.myHTML =
-  //    'I am an <code>HTML</code>string with ' +
-  //    '<a href="#">links!</a> and other <em>stuff</em>';
-    
+
+          });
+  }
 
 
-   
+
+
+  
+
 });
 
