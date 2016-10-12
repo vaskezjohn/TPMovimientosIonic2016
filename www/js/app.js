@@ -32,43 +32,60 @@ angular.module('starter', ['ionic', 'starter.controllers','firebase'])
     controller: 'AppCtrl'
   })
 
-  .state('app.search', {
-    url: '/search',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/search.html'
-      }
-    }
-  })
-
-  .state('app.browse', {
-      url: '/browse',
+  .state('app.trivia', {
+      url: '/trivia',
       views: {
         'menuContent': {
-          templateUrl: 'templates/browse.html',
-          controller: 'BrowseCtrl'
+          templateUrl: 'templates/trivia.html',
+          controller: 'TriviaCtrl'
         }
       }
     })
-    .state('app.playlists', {
-      url: '/playlists',
+  .state('app.prog', {
+      url: '/prog',
       views: {
         'menuContent': {
-          templateUrl: 'templates/playlists.html',
-          controller: 'PlaylistsCtrl'
+          templateUrl: 'templates/prog.html',
+          controller: 'ProgramadorCtrl'
         }
       }
     })
 
-  .state('app.single', {
-    url: '/playlists/:playlistId',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/playlist.html',
-        controller: 'PlaylistCtrl'
+  .state('app.login', {
+      url: '/login',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/login.html',
+          controller: 'LoginCtrl'
+        }
       }
-    }
-  });
+    })
+  .state('app.estadisticas', {
+      url: '/estadisticas',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/estadisticas.html',
+          controller: 'EstadisticasCtrl'
+        }
+      }
+    })
+   .state('app.fin', {
+      url: '/fin',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/finJuego.html',
+        }
+      }
+    })
+  .state('app.user', {
+      url: '/user',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/user.html',
+          controller: 'UserCtrl'
+        }
+      }
+    })
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('app/browse');
+  $urlRouterProvider.otherwise('app/trivia');
 });

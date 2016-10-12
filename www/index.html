@@ -5,6 +5,7 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <title></title>
 
+
     <link rel="manifest" href="manifest.json">
 
     <!-- un-comment this code to enable service worker
@@ -33,6 +34,18 @@
 
     <!-- Firebase -->
     <script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.4.1/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyCH0ht80snBIUNn_k7kIh8eLkdrrYUJvHQ",
+        authDomain: "trivia-86f1c.firebaseapp.com",
+        databaseURL: "https://trivia-86f1c.firebaseio.com",
+        storageBucket: "trivia-86f1c.appspot.com",
+        messagingSenderId: "103422522947"
+      };
+      firebase.initializeApp(config);
+    </script>
     <!-- AngularFire -->
     <script src="https://cdn.firebase.com/libs/angularfire/1.2.0/angularfire.min.js"></script>
     <!-- AngularCarrusel -->

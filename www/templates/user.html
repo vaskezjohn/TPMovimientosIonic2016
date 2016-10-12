@@ -1,0 +1,33 @@
+<ion-view view-title="Perfil">
+  <ion-content>
+	<div class="list">
+
+	  <a class="item item-icon-left">
+	    <i class="icon ion-email"></i>
+	    {{usuario.mail}}
+	  </a>
+
+	  <a class="item item-icon-left" href="#/app/estadisticas">
+	    <i class="icon ion-chatbubble-working"></i>
+	    Estadistcas de Juego
+	  </a>
+
+	  <a class="item item-icon-left" href="#">
+	    <i class="icon ion-person-stalker"></i>
+	    Amigos
+	    <span class="badge badge-assertive">0</span>
+	  </a>
+
+	  <button class="button button-block button-positive" ng-if="!usuario.mailVerificado" ng-click="VerMail()">
+		  Validar Mail
+	  </button>
+	  <button class="button button-block button-calm" ng-click="RestPass()">
+		  Cambiar Contraseña
+	  </button>
+	  <button class="button button-block button-assertive" ng-click="Logout()">
+		  Cerrar Sesion
+	  </button>
+
+	</div>
+  </ion-content>
+</ion-view>

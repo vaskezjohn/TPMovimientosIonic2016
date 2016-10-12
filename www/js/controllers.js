@@ -1,73 +1,176 @@
 angular.module('starter.controllers', [])
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
-
-  // With the new view caching in Ionic, Controllers are only called
-  // when they are recreated or on app start, instead of every page change.
-  // To listen for when this page is active (for example, to refresh data),
-  // listen for the $ionicView.enter event:
-  //$scope.$on('$ionicView.enter', function(e) {
-  //});
-
-  // Form data for the login modal
-  $scope.loginData = {};
-
-  // Create the login modal that we will use later
-  $ionicModal.fromTemplateUrl('templates/login.html', {
-    scope: $scope
-  }).then(function(modal) {
-    $scope.modal = modal;
+.controller('AppCtrl', function($scope, $ionicModal, $timeout,$state,$ionicHistory) {
+  $ionicHistory.nextViewOptions({
+    disableBack: true
   });
 
-  // Triggered in the login modal to close it
-  $scope.closeLogin = function() {
-    $scope.modal.hide();
+  $scope.button;
+  firebase.auth().onAuthStateChanged(function(user) {  
+       $timeout(function(){
+        if (!user) { 
+         $scope.button=true;
+        }else{
+          $scope.button=false;
+        }
+      })
+  }); 
+
+  $scope.Login=function(){
+    firebase.auth().onAuthStateChanged(function(user) {
+      $timeout(function() {
+        if (user) { 
+          $state.go("app.trivia");
+        }else {
+          $state.go("app.login");
+        }
+      }, 0);
+   }); 
+  }
+})
+
+.controller('UserCtrl', function($scope, $ionicModal, $timeout,$state,$ionicHistory) {
+  $ionicHistory.nextViewOptions({
+    disableBack: true
+  });
+
+  $scope.usuario={};
+  $scope.usuario.mail;
+  $scope.usuario.mailVerificado;
+
+  firebase.auth().onAuthStateChanged(function(user) {
+     $timeout(function() {
+      if (user) { 
+        console.info(user);
+        $scope.usuario.mailVerificado=user["emailVerified"];  
+        $scope.usuario.mail=user["email"]; 
+      }else{
+        $state.go("app.login");
+      }
+    }, 0);
+
+  });  
+
+  $scope.RestPass=function(){
+    console.log("entro");
+    firebase.auth().sendPasswordResetEmail($scope.usuario.mail).then(function(respuesta){
+      console.info(respuesta);
+    }).catch(function(error){
+      console.info(error);
+    });
   };
 
-  // Open the login modal
-  $scope.login = function() {
-    $scope.modal.show();
+  $scope.VerMail=function(){
+    firebase.auth().currentUser.sendEmailVerification().catch(function(error){
+      console.info(error);
+     });   
   };
 
-  // Perform the login action when the user submits the login form
-  $scope.doLogin = function() {
-    console.log('Doing login', $scope.loginData);
+  $scope.Logout=function(){
+    firebase.auth().signOut();
+  } 
+})
 
-    // Simulate a login delay. Remove this and replace with your login
-    // code if using a login system
-    $timeout(function() {
-      $scope.closeLogin();
-    }, 1000);
-  };
 
+
+.controller('LoginCtrl', function($scope, $ionicModal, $timeout,$state,$ionicHistory) {
+  $ionicHistory.nextViewOptions({
+    disableBack: true
+  });
+
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      $state.go("app.trivia");
+    }
+  });
+
+  $scope.usuario={};
+  $scope.usuario.mail="vaskezjohn@gmail.com";
+  $scope.usuario.clave="159159";
+  $scope.buttonOut=0;
+  $scope.habilitarForm=false;
+  $scope.habilitarButton=false;
+  $scope.habilitarButton2=false;
+
+
+  $scope.Loguear=function(){
+
+    firebase.auth().signInWithEmailAndPassword($scope.usuario.mail,$scope.usuario.clave).catch(function(error){
+
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      if (errorCode === 'auth/wrong-password'){
+        console.log(errorMessage);
+      }else{
+        console.log(errorCode);
+      }
+       console.log("Error: ", error);
+       $scope.habilitarForm=true;
+    }).then(function(user){
+      console.log("Usuario: ", user);
+      if(user){
+        if(!user.emailVerified){
+        console.log("el mail no esta verificado")
+        $scope.habilitarButton=true;
+        }
+      }
+      $state.go("app.trivia");
+      //$state.go("app.trivia");
+    })     
+  }  
 
 })
 
-.controller('PlaylistsCtrl', function($scope) {
-  $scope.playlists = [
-    { title: 'Reggae', id: 1 },
-    { title: 'Chill', id: 2 },
-    { title: 'Dubstep', id: 3 },
-    { title: 'Indie', id: 4 },
-    { title: 'Rap', id: 5 },
-    { title: 'Cowbell', id: 6 }
-  ];
 
 
+.controller('ProgramadorCtrl', function($scope,$ionicHistory) {
+  $ionicHistory.nextViewOptions({
+    disableBack: true
+  });
 })
 
-.controller('PlaylistCtrl', function($scope, $stateParams) {
+.controller('EstadisticasCtrl', function($scope,$ionicHistory,$timeout) {
+  $ionicHistory.nextViewOptions({
+    disableBack: false
+  });
+  firebase.auth().onAuthStateChanged(function(user) {
+
+  $timeout(function() {
+  if (user) { 
+
+  var ref = new Firebase('https://trivia-86f1c.firebaseio.com/usuarios');
 
 
- 
+
+  ref.orderByChild("usuario").equalTo("00"+nroPreg)
+          .on("child_added", function(snapshot) {
+                $timeout(function() {
+                   $scope.objecto = snapshot.val();
+                }, 0);
+          });
+
+  }
+  });
+ });
+})
+
+
+.controller('TriviaCtrl', function($scope, $stateParams,$timeout,$ionicPlatform,$state,$ionicHistory,$location) {
+  $ionicHistory.nextViewOptions({
+    disableBack: true
+  });
+
+ firebase.auth().onAuthStateChanged(function(user) {
+  $timeout(function() {
+  if (user) { 
+          
+        
   
-})
-
-
-.controller('BrowseCtrl', function($scope, $stateParams,$timeout,$ionicPlatform) {
   $scope.objecto;
   var cantPreg=0;
   var preg=1;
+  var respCorrectas=0;
+  var respIncorrectas=0;
   var ref = new Firebase('https://trivia-86f1c.firebaseio.com/preguntas');
 
   $ionicPlatform.ready(function() {
@@ -80,48 +183,48 @@ angular.module('starter.controllers', [])
 
   CargoPregunta(preg);
 
-  
-
   $scope.respuesta=function(res){
     if ($scope.objecto.respOk==res)
     {
+      respCorrectas +=1;
       console.log(preg);
       if(cantPreg>preg){
          preg+=1;
          CargoPregunta(preg); 
       }else{
-        preg=1;
-        console.log(preg);
-        CargoPregunta(preg);  
+        CargarEstadistica(user["email"],respCorrectas,respIncorrectas);
+        $state.go("app.fin");
+        //console.log("fin juego");
       }
      
-    //  console.log(cantPreg + " - " + preg);
-       
+    }else{
+      respIncorrectas+=1;
     }
   }
 
-   function CargoPregunta(nroPreg){
-     ref.orderByChild("idPreg").equalTo("00"+nroPreg)
-          .on("child_added", function(snapshot) {
-
-              // $scope.$apply(function() {
-              //     // console.info(snapshot.val());
-              //      $scope.objecto = snapshot.val();
-              // });
-
-                $timeout(function() {
-                   $scope.objecto = snapshot.val();
-                }, 0);
-
-
-
-          });
+  function CargarEstadistica(user,correctas,incorrectas){
+    firebase.database().ref('usuarios/').set({
+      usuario: user,
+      pregCorrectas: correctas,
+      pregIncorrectas: incorrectas
+    });
   }
 
 
+  function CargoPregunta(nroPreg){
+     ref.orderByChild("idPreg").equalTo("00"+nroPreg)
+          .on("child_added", function(snapshot) {
+                $timeout(function() {
+                   $scope.objecto = snapshot.val();
+                }, 0);
+          });
+  }
 
-
-  
+  }else{
+          $state.go("app.login");
+        }
+      }, 0);
+   });
 
 });
 
