@@ -67,6 +67,9 @@ angular.module('starter.controllers', [])
   };
 
   $scope.Logout=function(){
+  $ionicHistory.nextViewOptions({
+      disableBack: true
+  });
     firebase.auth().signOut();
   } 
 })
@@ -75,7 +78,7 @@ angular.module('starter.controllers', [])
 
 .controller('LoginCtrl', function($scope, $ionicModal, $timeout,$state,$ionicHistory) {
   $ionicHistory.nextViewOptions({
-    disableBack: true
+      disableBack: true
   });
 
   firebase.auth().onAuthStateChanged(function(user) {
@@ -94,6 +97,9 @@ angular.module('starter.controllers', [])
 
 
   $scope.Loguear=function(){
+    $ionicHistory.nextViewOptions({
+      disableBack: true
+  });
 
     firebase.auth().signInWithEmailAndPassword($scope.usuario.mail,$scope.usuario.clave).catch(function(error){
 
@@ -121,41 +127,33 @@ angular.module('starter.controllers', [])
 
 })
 
-
-
-.controller('ProgramadorCtrl', function($scope,$ionicHistory) {
-  $ionicHistory.nextViewOptions({
-    disableBack: true
-  });
-})
-
 .controller('EstadisticasCtrl', function($scope,$ionicHistory,$timeout) {
-  $ionicHistory.nextViewOptions({
-    disableBack: false
-  });
-  firebase.auth().onAuthStateChanged(function(user) {
+$ionicHistory.nextViewOptions({
+      disableBack: true
+});
+ $scope.estadistica;
+ firebase.auth().onAuthStateChanged(function(user) {
 
-  $timeout(function() {
-  if (user) { 
-
-  var ref = new Firebase('https://trivia-86f1c.firebaseio.com/usuarios');
-
-
-
-  ref.orderByChild("usuario").equalTo("00"+nroPreg)
+ $timeout(function() {
+ if (user) { 
+ 
+  var ref = new Firebase('https://trivia-86f1c.firebaseio.com');
+   
+      ref.orderByChild("mail").equalTo(user["email"])
           .on("child_added", function(snapshot) {
                 $timeout(function() {
-                   $scope.objecto = snapshot.val();
+                  console.info(snapshot.val());
+                   $scope.estadistica = snapshot.val();
+                    console.info($scope.estadistica.pregCorrectas);
                 }, 0);
           });
-
   }
   });
  });
 })
 
 
-.controller('TriviaCtrl', function($scope, $stateParams,$timeout,$ionicPlatform,$state,$ionicHistory,$location) {
+.controller('TriviaCtrl', function($scope,$interval, $stateParams,$timeout,$ionicPlatform,$state,$ionicHistory,$location) {
   $ionicHistory.nextViewOptions({
     disableBack: true
   });
@@ -165,7 +163,7 @@ angular.module('starter.controllers', [])
   if (user) { 
           
         
-  
+  $scope.contador=8;
   $scope.objecto;
   var cantPreg=0;
   var preg=1;
@@ -173,6 +171,7 @@ angular.module('starter.controllers', [])
   var respIncorrectas=0;
   var ref = new Firebase('https://trivia-86f1c.firebaseio.com/preguntas');
 
+  console.info($scope.objecto);
   $ionicPlatform.ready(function() {
     ionic.Platform.fullScreen();
   });
@@ -183,18 +182,37 @@ angular.module('starter.controllers', [])
 
   CargoPregunta(preg);
 
+  var stop = $interval(function() {
+    if($scope.contador>0){
+      $scope.contador -= 1;
+    }else{
+      $scope.contador=8;
+      respIncorrectas+=1;
+      preg+=1;
+      CargoPregunta(preg);
+      if(cantPreg<preg){
+        $interval.cancel(stop);
+        CargarEstadistica(user["email"],respCorrectas,respIncorrectas);
+        $state.go("app.fin");
+      }
+      
+    }
+        
+  }, 1000);
+
   $scope.respuesta=function(res){
     if ($scope.objecto.respOk==res)
     {
+      console.info($scope.objecto);
       respCorrectas +=1;
       console.log(preg);
       if(cantPreg>preg){
+         $scope.contador=8;
          preg+=1;
          CargoPregunta(preg); 
       }else{
         CargarEstadistica(user["email"],respCorrectas,respIncorrectas);
         $state.go("app.fin");
-        //console.log("fin juego");
       }
      
     }else{
@@ -204,7 +222,7 @@ angular.module('starter.controllers', [])
 
   function CargarEstadistica(user,correctas,incorrectas){
     firebase.database().ref('usuarios/').set({
-      usuario: user,
+      mail: user,
       pregCorrectas: correctas,
       pregIncorrectas: incorrectas
     });
@@ -215,6 +233,7 @@ angular.module('starter.controllers', [])
      ref.orderByChild("idPreg").equalTo("00"+nroPreg)
           .on("child_added", function(snapshot) {
                 $timeout(function() {
+                  
                    $scope.objecto = snapshot.val();
                 }, 0);
           });
@@ -226,5 +245,32 @@ angular.module('starter.controllers', [])
       }, 0);
    });
 
+})
+.controller('ProgramadorCtrl', function($scope,$ionicHistory,$cordovaInAppBrowser) {
+  $ionicHistory.nextViewOptions({
+    disableBack: true
+  });
+  var options = {
+    location: 'yes',
+    clearcache: 'yes',
+    toolbar: 'no'
+  };
+
+  $scope.OpenGitHub=function(){
+    $cordovaInAppBrowser.open('https://github.com/vaskezjohn/', '_self', options)
+      .then(function(event) {
+        // success
+      })
+      .catch(function(event) {
+        // error
+      });
+  };
+
+})
+.controller('FinCtrl', function($scope,$ionicHistory) {
+  $ionicHistory.nextViewOptions({
+    disableBack: true
+  });
 });
+
 

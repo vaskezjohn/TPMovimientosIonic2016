@@ -74,6 +74,7 @@ angular.module('starter', ['ionic', 'starter.controllers','firebase'])
       views: {
         'menuContent': {
           templateUrl: 'templates/finJuego.html',
+          controller: 'FinCtrl'
         }
       }
     })

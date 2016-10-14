@@ -2,10 +2,12 @@
   <ion-content>
   <div ng-if="objecto">
   	<h1>{{titulo}}</h1>
+    <h4>Tiempo: {{contador}} seg.</h4>
   	<div id='boxShadow'>{{objecto.preg}}</div>
 					  <div ng-style="section">
+
 					    <div ng-repeat="(key, value) in objecto.opciones">
-					      <button  class="button button-outline button-full button-positive" type="button" ng-click="respuesta(key)"> {{value}} </button>
+					      <button  class="button button-outline button-block button-positive" type="button" ng-click="respuesta(key)"> {{value}} </button>
 					    </div>
 					  </div>			
   </div>					 

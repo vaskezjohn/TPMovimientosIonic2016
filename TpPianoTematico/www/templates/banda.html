@@ -1,0 +1,63 @@
+<ion-view view-title="Star Wars">
+  <ion-content id="fhm_page">
+  <div align="center" class="fhm_control">
+      <div align="center" class="button-bar bar-dark">
+        <button ng-disabled="UsuarioSecuencia.isPlaying()" ng-click="BorrarSecuencia(0)" class="button button-assertive rounded button-stable">
+          <p ng-if="UsuarioSecuencia.getSecuencia().length < 1">1</p>
+          <img ng-if="UsuarioSecuencia.getSecuencia().length >= 1" src="img/{{UsuarioSecuencia.getSecuencia()[0]}}.png">
+        </button>
+        <button ng-disabled="UsuarioSecuencia.isPlaying()" ng-click="BorrarSecuencia(1)" class="button button-assertive rounded button-stable">
+          <p ng-if="UsuarioSecuencia.getSecuencia().length < 2">2</p>
+          <img ng-if="UsuarioSecuencia.getSecuencia().length >= 2" src="img/{{UsuarioSecuencia.getSecuencia()[1]}}.png">
+        </button>
+        <button ng-disabled="UsuarioSecuencia.isPlaying()" ng-click="BorrarSecuencia(2)" class="button button-assertive rounded button-stable">
+          <p ng-if="UsuarioSecuencia.getSecuencia().length < 3">3</p>
+          <img ng-if="UsuarioSecuencia.getSecuencia().length >= 3" src="img/{{UsuarioSecuencia.getSecuencia()[2]}}.png">
+        </button>
+        <button ng-disabled="UsuarioSecuencia.isPlaying()" ng-click="BorrarSecuencia(3)" class="button button-assertive rounded button-stable">
+          <p ng-if="UsuarioSecuencia.getSecuencia().length < 4">4</p>
+          <img ng-if="UsuarioSecuencia.getSecuencia().length >= 4" src="img/{{UsuarioSecuencia.getSecuencia()[3]}}.png">
+        </button>
+        <button ng-disabled="UsuarioSecuencia.isPlaying()" ng-click="BorrarSecuencia(4)" class="button button-assertive rounded button-stable">
+          <p ng-if="UsuarioSecuencia.getSecuencia().length < 5">5</p>
+          <img ng-if="UsuarioSecuencia.getSecuencia().length >= 5" src="img/{{UsuarioSecuencia.getSecuencia()[4]}}.png">
+        </button>
+        <button ng-disabled="UsuarioSecuencia.isPlaying()" ng-click="BorrarSecuencia(5)" class="button button-assertive rounded button-stable">
+          <p ng-if="UsuarioSecuencia.getSecuencia().length < 6">6</p>
+          <img ng-if="UsuarioSecuencia.getSecuencia().length >= 6" src="img/{{UsuarioSecuencia.getSecuencia()[5]}}.png">
+        </button>
+      </div>
+      <div class="button-bar bar-dark">
+        <button ng-disabled="UsuarioSecuencia.isPlaying()" ng-click="Reproducir(false)" class="button button-balanced button-stable icon ion-play"></button>
+        <button ng-disabled="UsuarioSecuencia.isPlaying()" ng-click="Reproducir(true)" class="button button-positive button-stable icon ion-android-archive"></button>
+        <button ng-disabled="UsuarioSecuencia.isPlaying()" ng-click="Grabar()" class="button button-record icon ion-record"></button>
+      </div>
+    </div>
+      <div class="fhm_container">
+        <div class="fhm_row">
+          <div class="fhm_item">
+            <button ng-disabled="UsuarioSecuencia.isPlaying()" ng-click="TocarPiano('chewbacca')" class="push_button_banda">
+				      <img src="img/chewbacca.png">
+			     </button>
+          </div>
+          <div class="fhm_item">
+            <button ng-disabled="UsuarioSecuencia.isPlaying()" ng-click="TocarPiano('Lightsaber')" class="push_button_banda">
+              <img src="img/Lightsaber.png">
+			</button>
+          </div>
+        </div>
+        <div class="fhm_row">
+          <div class="fhm_item">
+            <button ng-disabled="UsuarioSecuencia.isPlaying()" ng-click="TocarPiano('r2d2')" class="push_button_banda">
+              <img src="img/r2d2.png">
+			</button>
+          </div>
+          <div class="fhm_item">
+            <button ng-disabled="UsuarioSecuencia.isPlaying()" ng-click="TocarPiano('blaster')"class="push_button_banda">
+              <img src="img/blaster.png">
+			</button>
+          </div>
+
+      </div>
+    </ion-content>
+</ion-view>
