@@ -1,59 +1,147 @@
 angular.module('starter.controllers', [])
 
-.controller('AppCtrl', function($scope, $ionicModal,$ionicPlatform, $timeout, UsuarioMovimiento) {
-
-  // With the new view caching in Ionic, Controllers are only called
-  // when they are recreated or on app start, instead of every page change.
-  // To listen for when this page is active (for example, to refresh data),
-  // listen for the $ionicView.enter event:
-  //$scope.$on('$ionicView.enter', function(e) {
-  //});
-
-$scope.UsuarioMovimiento = UsuarioMovimiento;
-
-$ionicPlatform.registerBackButtonAction(function (event) {
-    navigator.app.exitApp(); //<-- remove this line to disable the exit
-  }, 100);
-
-  // Form data for the login modal
-  $scope.loginData = {};
-
-  // Create the login modal that we will use later
-  $ionicModal.fromTemplateUrl('templates/login.html', {
-    scope: $scope,
-    backdropClickToClose: false
-  }).then(function(modal) {
-    $scope.modal = modal;
-    $scope.login();
+.controller('AppCtrl', function($scope, $ionicModal, $timeout,$state,$ionicHistory) {
+  $ionicHistory.nextViewOptions({
+    disableBack: true
   });
 
-  // Triggered in the login modal to close it
-  $scope.closeLogin = function() {
-    $scope.modal.hide();
-  };
+  $scope.button;
+  firebase.auth().onAuthStateChanged(function(user) {  
+       $timeout(function(){
+        if (!user) { 
+         $scope.button=true;
+        }else{
+          $scope.button=false;
+        }
+      })
+  }); 
 
-  // Open the login modal
-  $scope.login = function() {
-    $scope.modal.show();
-  };
-
-  // Perform the login action when the user submits the login form
-  $scope.doLogin = function() {
-    console.log('Doing login', $scope.loginData);
-    UsuarioMovimiento.login($scope.loginData.username);
-    // Simulate a login delay. Remove this and replace with your login
-    // code if using a login system
-    $timeout(function() {
-      $scope.closeLogin();
-    }, 500);
-  };
+  $scope.Login=function(){
+    firebase.auth().onAuthStateChanged(function(user) {
+      $timeout(function() {
+        if (user) { 
+          $state.go("tab.accel");
+        }else {
+          $state.go("tab.login");
+        }
+      }, 0);
+   }); 
+  }
 })
 
-.controller('AuthorCtrl', function($scope) {
+.controller('UserCtrl', function($scope, $ionicModal, $timeout,$state,$ionicHistory) {
+  $ionicHistory.nextViewOptions({
+    disableBack: true
+  });
+
+  $scope.usuario={};
+  $scope.usuario.mail;
+  $scope.usuario.mailVerificado;
+
+  firebase.auth().onAuthStateChanged(function(user) {
+     $timeout(function() {
+      if (user) { 
+        console.info(user);
+        $scope.usuario.mailVerificado=user["emailVerified"];  
+        $scope.usuario.mail=user["email"]; 
+      }else{
+        $state.go("tab.login");
+      }
+    }, 0);
+
+  });  
+
+  $scope.RestPass=function(){
+    console.log("entro");
+    firebase.auth().sendPasswordResetEmail($scope.usuario.mail).then(function(respuesta){
+      console.info(respuesta);
+    }).catch(function(error){
+      console.info(error);
+    });
+  };
+
+  $scope.VerMail=function(){
+    firebase.auth().currentUser.sendEmailVerification().catch(function(error){
+      console.info(error);
+     });   
+  };
+
+  $scope.Logout=function(){
+  $ionicHistory.nextViewOptions({
+      disableBack: true
+  });
+    firebase.auth().signOut();
+  } 
+})
+
+.controller('LoginCtrl', function($scope, $ionicModal, $timeout,$state) {
+
+
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      $state.go("tab.accel");
+    }
+  });
+
+  $scope.usuario={};
+  $scope.usuario.mail="vaskezjohn@gmail.com";
+  $scope.usuario.clave="159159";
+  $scope.buttonOut=0;
+  $scope.habilitarForm=false;
+  $scope.habilitarButton=false;
+  $scope.habilitarButton2=false;
+
+
+  $scope.Loguear=function(){
+   
+    firebase.auth().signInWithEmailAndPassword($scope.usuario.mail,$scope.usuario.clave).catch(function(error){
+
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      if (errorCode === 'auth/wrong-password'){
+        console.log(errorMessage);
+      }else{
+        console.log(errorCode);
+      }
+       console.log("Error: ", error);
+       $scope.habilitarForm=true;
+    }).then(function(user){
+      console.log("Usuario: ", user);
+      if(user){
+        if(!user.emailVerified){
+        console.log("el mail no esta verificado")
+        $scope.habilitarButton=true;
+        }
+      }
+      $state.go("tab.accel");
+      //$state.go("app.trivia");
+    })     
+  }  
 
 })
 
-.controller('AccelCtrl', function($scope,$timeout,$ionicPlatform,$cordovaDeviceMotion,$cordovaMedia,$cordovaFile,UsuarioMovimiento) {
+
+.controller('AuthorCtrl', function($scope,$cordovaInAppBrowser,$ionicPopup) {
+
+  var options = {
+    location: 'yes',
+    clearcache: 'yes',
+    toolbar: 'no'
+  };
+
+  $scope.OpenGitHub=function(){
+    $cordovaInAppBrowser.open('https://github.com/vaskezjohn/', '_self', options)
+      .then(function(event) {
+        // success
+      })
+      .catch(function(event) {
+        // error
+      });
+  };
+
+})
+
+.controller('AccelCtrl', function($scope,$timeout,$state,$ionicPlatform,$cordovaDeviceMotion,$cordovaMedia,$cordovaFile,UsuarioMovimiento) {
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
   // To listen for when this page is active (for example, to refresh data),
@@ -61,7 +149,12 @@ $ionicPlatform.registerBackButtonAction(function (event) {
   //
   //$scope.$on('$ionicView.enter', function(e) {
   //});
-    
+ firebase.auth().onAuthStateChanged(function(user) {
+  $timeout(function() {
+  if (user) { 
+
+
+  // if($ionicPlatform.isAndroid){ 
     $cordovaFile.checkDir(cordova.file.externalApplicationStorageDirectory, "files/"+UsuarioMovimiento.getName())
       .then(function (success) {
         // success
@@ -453,6 +546,13 @@ $ionicPlatform.registerBackButtonAction(function (event) {
     $scope.$on('$ionicView.beforeLeave', function(){
         $scope.watch.clearWatch(); // Turn off motion detection watcher
     }); 
+//}
+
+  }else{
+          $state.go("tab.login");
+        }
+      }, 0);
+   });
 })
 
 .controller('AccountCtrl', function($scope) {

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <widget id="com.ionicframework.murciamovimientos834356" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <name>MurciaMovimientos</name>
+  <name>Movimientos</name>
   <description>&#xD;
         Detecta Movimientos y reproduce sonidos grabados!&#xD;
     </description>
-  <author email="marcosmurcia92@gmail.com" href="https://github.com/marcosmurcia92/">&#xD;
-      Marcos Facundo Murcia&#xD;
+  <author email="" href="">&#xD;
+      &#xD;
     </author>
   <content src="index.html"/>
   <access origin="*"/>

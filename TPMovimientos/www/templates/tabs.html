@@ -10,15 +10,23 @@ navigation history that also transitions its views in and out.
     <ion-nav-view name="tab-author"></ion-nav-view>
   </ion-tab>
 
+   <!-- Dashboard Tab -->
+  <ion-tab title="Perfil" icon-off="ion-android-person" icon-on="ion-android-person" href="#/tab/user">
+    <ion-nav-view name="tab-user"></ion-nav-view>
+  </ion-tab>
+
   <!-- Chats Tab -->
   <ion-tab title="Accelerate" icon-off="ion-android-phone-landscape" icon-on="ion-android-phone-portrait" href="#/tab/accelerate">
     <ion-nav-view name="tab-accel"></ion-nav-view>
   </ion-tab>
 
-  <!-- Account Tab -->
-  <!-- <ion-tab title="Account" icon-off="ion-ios-gear-outline" icon-on="ion-ios-gear" href="#/tab/account">
-    <ion-nav-view name="tab-account"></ion-nav-view>
-  </ion-tab> -->
+
+  <!-- Login Tab -->
+
+   <ion-tab title="Login" icon-off="ion-ios-gear-outline" icon-on="ion-ios-gear"  ng-click="Login()">
+    <ion-nav-view name="tab-login"></ion-nav-view>
+  </ion-tab> 
+
 
 
 </ion-tabs>

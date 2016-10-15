@@ -1,0 +1,19 @@
+<ion-modal-view>
+  <ion-content>
+    <form ng-submit="Loguear()">
+      <div class="list">
+        <label class="item item-input">
+          <span class="input-label">Usuario</span>
+          <input type="text" ng-model="usuario.mail">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Password</span>
+          <input type="password" ng-model="usuario.clave">
+        </label>
+        <label class="item">
+        <button class="button button-block button-positive" type="submit">Log in</button>
+        </label>
+      </div>
+    </form>
+  </ion-content>
+</ion-modal-view>

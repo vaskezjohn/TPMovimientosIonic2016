@@ -60,6 +60,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services','n
       }
     }
   })
+  .state('tab.login', {
+    url: '/login',
+    views: {
+      'tab-login': {
+        templateUrl: 'templates/tab-login.html',
+        controller: 'LoginCtrl'
+      }
+    }
+  })
 
   .state('tab.accel', {
       url: '/accelerate',
@@ -67,6 +76,16 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services','n
         'tab-accel': {
           templateUrl: 'templates/tab-accel.html',
           controller: 'AccelCtrl'
+        }
+      }
+    })
+
+  .state('tab.user', {
+      url: '/user',
+      views: {
+        'tab-user': {
+          templateUrl: 'templates/tab-user.html',
+          controller: 'UserCtrl'
         }
       }
     })
@@ -82,6 +101,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services','n
   });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/author');
+  $urlRouterProvider.otherwise('/tab/login');
 
 });
