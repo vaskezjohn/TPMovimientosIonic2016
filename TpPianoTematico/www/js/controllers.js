@@ -1,7 +1,52 @@
 angular.module('starter.controllers', [])
 
 
-.controller('AppCtrl', function($scope, $ionicModal,$ionicPopup,$cordovaNativeAudio,$ionicPlatform, $timeout, UsuarioSecuencia) {
+.controller('LoginCtrl', function($scope, $ionicModal,$ionicPopup,$cordovaNativeAudio,$ionicPlatform,$ionicHistory, $timeout,$state, UsuarioSecuencia) {
+ firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      $state.go("app.banda");
+    }
+  });
+
+  $scope.usuario={};
+  $scope.usuario.mail="vaskezjohn@gmail.com";
+  $scope.usuario.clave="159159";
+  $scope.buttonOut=0;
+  $scope.habilitarForm=false;
+  $scope.habilitarButton=false;
+  $scope.habilitarButton2=false;
+
+
+  $scope.Loguear=function(){
+    $ionicHistory.nextViewOptions({
+      disableBack: true
+  });
+
+    firebase.auth().signInWithEmailAndPassword($scope.usuario.mail,$scope.usuario.clave).catch(function(error){
+
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      if (errorCode === 'auth/wrong-password'){
+        console.log(errorMessage);
+      }else{
+        console.log(errorCode);
+      }
+       console.log("Error: ", error);
+       $scope.habilitarForm=true;
+    }).then(function(user){
+      console.log("Usuario: ", user);
+      if(user){
+        if(!user.emailVerified){
+        console.log("el mail no esta verificado")
+        $scope.habilitarButton=true;
+        }
+      }
+      $state.go("app.trivia");
+      //$state.go("app.trivia");
+    })     
+  }  
+})
+.controller('AppCtrl', function($scope,$state, $ionicModal,$ionicPopup,$cordovaNativeAudio,$ionicPlatform, $timeout, UsuarioSecuencia) {
 
   $ionicPlatform.ready(function(){
       
@@ -41,6 +86,29 @@ angular.module('starter.controllers', [])
 
   });
 
+ $scope.button;
+  firebase.auth().onAuthStateChanged(function(user) {  
+       $timeout(function(){
+        if (!user) { 
+         $scope.button=true;
+        }else{
+          $scope.button=false;
+        }
+      })
+  }); 
+
+  $scope.Login=function(){
+    firebase.auth().onAuthStateChanged(function(user) {
+      $timeout(function() {
+        if (user) { 
+          $state.go("app.banda");
+        }else {
+          $state.go("app.login");
+        }
+      }, 0);
+   }); 
+  }
+
 $scope.UsuarioSecuencia = UsuarioSecuencia;
 
 $ionicPlatform.registerBackButtonAction(function (event) {
@@ -51,133 +119,34 @@ $ionicPlatform.registerBackButtonAction(function (event) {
     navigator.app.exitApp(); //<-- remove this line to disable the exit
   }, 100);
 
-  // Form data for the login modal
-  $scope.loginData = {};
-  $scope.registerData = {};
-  $scope.isLogged = false;
-  $scope.modalState = 'Login';
 
-  // Create the login modal that we will use later
-  $ionicModal.fromTemplateUrl('templates/login.html', {
-    scope: $scope,
-    backdropClickToClose: false
-  }).then(function(modal) {
-    $scope.modal = modal;
-    $scope.login();
-  });
+  // $scope.doRegister = function(){
+  //     firebase.auth().createUserWithEmailAndPassword($scope.registerData.username, $scope.registerData.password)
+  //     .then(function(respuesta) {
+  //       console.info("Success Register",respuesta);
+  //       console.log(firebase.auth().currentUser);
+  //       if(!respuesta.emailVerified){
+  //         firebase.auth().currentUser.sendEmailVerification().then(function(){
+  //              var alertPopup = $ionicPopup.alert({
+  //                title: 'Verificacion de Email',
+  //                template: 'Se ha enviado un mail para verificar la direccion del usuario'
+  //              });
 
-  // Triggered in the login modal to close it
-  $scope.closeLogin = function() {
-    $scope.modal.hide();
-  };
-
-  // Open the login modal
-  $scope.login = function() {
-    $scope.modalState = 'Login';
-    $scope.modal.show();
-  };
-
-  // Perform the login action when the user submits the login form
-  $scope.doLogin = function() {
-    firebase.auth().signInWithEmailAndPassword($scope.loginData.username, $scope.loginData.password)
-      .catch(function(error) {
-      // Handle Errors here.
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      console.info("ERROR " + errorCode, errorMessage);
-      // ...
-    }).then(function(success){
-      console.info("SUCCESS",success);
-      $timeout(function(){
-        if(success){
-          if(firebase.auth().currentUser.emailVerified){
-            $scope.isLogged = true;
-          }else{
-            firebase.auth().currentUser.sendEmailVerification().then(function(){
-               var alertPopup = $ionicPopup.alert({
-                 title: 'Verificacion de Email',
-                 template: 'Se ha enviado un mail para verificar la direccion del usuario'
-               });
-
-               alertPopup.then(function(res) {
-                 console.log('Alert de Verificacion cerrado');
-               });
-            },function(error){
-              console.info("Verification error",error);
-            });
-            
-          }
-        }else{
-          $scope.isLogged = false;
-        }
-      },100);
-    });
-
-    console.log('Doing login', $scope.loginData);
-    UsuarioSecuencia.login($scope.loginData.username);
-  };
-
-  $scope.doRegister = function(){
-      firebase.auth().createUserWithEmailAndPassword($scope.registerData.username, $scope.registerData.password)
-      .then(function(respuesta) {
-        console.info("Success Register",respuesta);
-        console.log(firebase.auth().currentUser);
-        if(!respuesta.emailVerified){
-          firebase.auth().currentUser.sendEmailVerification().then(function(){
-               var alertPopup = $ionicPopup.alert({
-                 title: 'Verificacion de Email',
-                 template: 'Se ha enviado un mail para verificar la direccion del usuario'
-               });
-
-               alertPopup.then(function(res) {
-                 console.log('Alert de Verificacion cerrado');
-               });
-            },function(error){
-              console.info("Verification error",error);
-            });
-        }
-      }, function(error) {
-        console.info("Error Register",error);
-        var alertPopup = $ionicPopup.alert({
-           title: 'Register Error',
-           template: error.message
-         });
-      });
-  }
-
-  $scope.resetPassword = function(){
-      firebase.auth().sendPasswordResetEmail($scope.loginData.username).then(function(respuesta) {
-        // Email sent.
-        console.info("Success Reset",respuesta);
-      }, function(error) {
-        // An error happened.
-        console.info("Error Reset",error);
-      });
-  };
-
-  $scope.goToRegister = function(){
-    $timeout(function(){
-      $scope.modalState = 'Register';
-    },100);
-  };
-
-  $scope.goToLogin = function(){
-    $timeout(function(){
-      $scope.modalState = 'Login';
-    },100);
-  };
-
-  $scope.doLogout = function(){
-    firebase.auth().signOut().then(function() {
-      // Sign-out successful.
-      console.log("LOG OUT SUCCESS");
-      $timeout(function(){
-          $scope.isLogged = false;
-      },100);
-    }, function(error) {
-      console.info("ERROR LOGOUT",error);
-    });
-  };
+  //              alertPopup.then(function(res) {
+  //                console.log('Alert de Verificacion cerrado');
+  //              });
+  //           },function(error){
+  //             console.info("Verification error",error);
+  //           });
+  //       }
+  //     }, function(error) {
+  //       console.info("Error Register",error);
+  //       var alertPopup = $ionicPopup.alert({
+  //          title: 'Register Error',
+  //          template: error.message
+  //        });
+  //     });
+  // }
 })
 
 .controller('AutorCtrl', function($scope, $stateParams,$cordovaInAppBrowser) {
@@ -203,9 +172,9 @@ $ionicPlatform.registerBackButtonAction(function (event) {
   $scope.usuario.mail;
   $scope.usuario.mailVerificado;
 
-  firebase.auth().onAuthStateChanged(function(user) {
-     $timeout(function() {
-      if (user) { 
+   firebase.auth().onAuthStateChanged(function(user) {
+      $timeout(function() {
+       if (user) { 
         console.info(user);
         $scope.usuario.mailVerificado=user["emailVerified"];  
         $scope.usuario.mail=user["email"]; 
@@ -244,8 +213,14 @@ $ionicPlatform.registerBackButtonAction(function (event) {
 
 .controller('PianoCtrl', function($scope, $stateParams,$timeout,$ionicPlatform,$cordovaVibration,$cordovaNativeAudio,$cordovaDevice,$ionicSideMenuDelegate,UsuarioSecuencia,$interval,$ionicPopup,$cordovaFile) {
   $ionicSideMenuDelegate.canDragContent(false);
+   var ref = new Firebase('https://piano-bec4f.firebaseio.com/');
+
 
   $scope.UsuarioSecuencia = UsuarioSecuencia;
+
+  firebase.auth().onAuthStateChanged(function(user){
+  $timeout(function(){
+  if (user) { 
 
   $scope.TocarPiano=function(sonido){
     //alert("/android_asset/www/mp3/banda/"+sonido+".mp3");
@@ -327,6 +302,9 @@ $ionicPlatform.registerBackButtonAction(function (event) {
                        title: 'Objeto JSON Guardado!',
                        template: success
                      });
+                      firebase.database().ref('secuencias/').set({
+                        secuencia: JSON.parse(success)
+                       });
                   }, function (error) {
                       console.info("ERROR READ FILE",error);
                       var alertPopup = $ionicPopup.alert({
@@ -360,6 +338,9 @@ $ionicPlatform.registerBackButtonAction(function (event) {
                        title: 'Objeto JSON Guardado!',
                        template: success
                      });
+                      firebase.database().ref('secuencias/').set({
+                        secuencia: JSON.parse(success)
+                       });
                   }, function (error) {
                       console.info("ERROR READ FILE",error);                  
                       var alertPopup = $ionicPopup.alert({
@@ -381,4 +362,9 @@ $ionicPlatform.registerBackButtonAction(function (event) {
 
           });
 };
+ }else{
+           $state.go("app.login");
+         }
+       }, 0);
+  });
 });

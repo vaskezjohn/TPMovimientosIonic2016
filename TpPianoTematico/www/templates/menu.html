@@ -18,16 +18,16 @@
     </ion-header-bar>
     <ion-content>
       <ion-list>
-        <!-- <ion-item menu-close ng-click="login()">
+         <ion-item menu-close  ng-click="Login()" ng-if="button">
           Login
-        </ion-item> -->
-        <ion-item menu-close href="#/app/autor">
-          Autor
         </ion-item>
-        <ion-item menu-close href="#/app/banda">
+        <ion-item menu-close href="#/app/autor">
+          Perfil Programador
+        </ion-item>
+        <ion-item menu-close href="#/app/banda" ng-if="!button">
           Star Wars
         </ion-item>
-         <ion-item menu-close href="#/app/user">
+         <ion-item menu-close href="#/app/user" ng-if="!button">
           Perfil
         </ion-item>
       </ion-list>

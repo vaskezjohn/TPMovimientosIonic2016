@@ -1,6 +1,6 @@
 // Ionic Starter App
 
-angular.module('starter', ['ionic','ngCordova', 'starter.controllers','starter.services',])
+angular.module('starter', ['ionic','ngCordova', 'starter.controllers','starter.services','firebase'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -51,6 +51,15 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers','starter.s
       }
     }
   })
+   .state('app.login', {
+      url: '/login',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/login.html',
+          controller: 'LoginCtrl'
+        }
+      }
+    })
 
 
   .state('app.banda', {

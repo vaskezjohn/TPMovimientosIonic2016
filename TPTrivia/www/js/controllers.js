@@ -153,7 +153,7 @@ $ionicHistory.nextViewOptions({
 })
 
 
-.controller('TriviaCtrl', function($scope,$interval, $stateParams,$timeout,$ionicPlatform,$state,$ionicHistory,$location) {
+.controller('TriviaCtrl', function($scope,$ionicPopup,$interval, $stateParams,$timeout,$ionicPlatform,$state,$ionicHistory,$location,$cordovaFile) {
   $ionicHistory.nextViewOptions({
     disableBack: true
   });
@@ -167,6 +167,7 @@ $ionicHistory.nextViewOptions({
   $scope.objecto;
   var cantPreg=0;
   var preg=1;
+  var respString="";
   var respCorrectas=0;
   var respIncorrectas=0;
   var ref = new Firebase('https://trivia-86f1c.firebaseio.com/preguntas');
@@ -193,31 +194,74 @@ $ionicHistory.nextViewOptions({
       if(cantPreg<preg){
         $interval.cancel(stop);
         CargarEstadistica(user["email"],respCorrectas,respIncorrectas);
-        $state.go("app.fin");
+        CrearStringRespuesta($scope.objecto.preg,"Paso el Tiempo");
+        //$state.go("app.fin");
       }
       
     }
         
   }, 1000);
 
-  $scope.respuesta=function(res){
+  $scope.respuesta=function(res,valRes){
     if ($scope.objecto.respOk==res)
     {
-      console.info($scope.objecto);
       respCorrectas +=1;
-      console.log(preg);
+      CrearStringRespuesta($scope.objecto.preg,valRes);
+
       if(cantPreg>preg){
          $scope.contador=8;
          preg+=1;
          CargoPregunta(preg); 
       }else{
         CargarEstadistica(user["email"],respCorrectas,respIncorrectas);
+        Guardar(CrearJsonRespuesta(respString));
+        
         $state.go("app.fin");
       }
      
     }else{
       respIncorrectas+=1;
+      CrearStringRespuesta($scope.objecto.preg,valRes);
+
+      if(cantPreg>preg){
+         $scope.contador=8;
+         preg+=1;
+         var alertPopup = $ionicPopup.alert({
+          title: 'INCORRECTO',
+          template: "La respuesta CORRECTA es: " + $scope.objecto.respOk
+         });
+
+         alertPopup.then(function(res) {
+           CargoPregunta(preg); 
+         });
+         $timeout(function() {
+             alertPopup.close(); //close the popup after 3 seconds for some reason
+             CargoPregunta(preg); 
+         }, 3000);
+      }else{
+        CargarEstadistica(user["email"],respCorrectas,respIncorrectas);
+        Guardar(CrearJsonRespuesta(respString));
+      
+        $state.go("app.fin");
+      }     
     }
+  }
+
+  function CrearStringRespuesta(preg,resp){
+
+   if (respString==""){
+       respString+="Pregunta: " + preg +" Repuesta: " + resp;
+    }else{
+       respString+="-" + "Pregunta: " + preg + " Repuesta: " + resp;
+    }
+  }
+
+
+  function CrearJsonRespuesta(resp){
+    var objRespuestas={};
+    objRespuestas.usuario=user["email"];
+    objRespuestas.respuesta=resp;
+    return  JSON.stringify(objRespuestas);
   }
 
   function CargarEstadistica(user,correctas,incorrectas){
@@ -239,6 +283,80 @@ $ionicHistory.nextViewOptions({
           });
   }
 
+  function Guardar(objJsonRespuestas){
+     // console.log(UsuarioSecuencia.getSecuenciaString());
+
+     // if($ionicPlatform.isAndroid){
+          $cordovaFile.checkDir(cordova.file.externalApplicationStorageDirectory, "files")
+          .then(function (success) {
+
+            console.info("SUCCESS CHECK",success);
+            $cordovaFile.writeFile(cordova.file.externalApplicationStorageDirectory, "files/repuestas.txt",objJsonRespuestas, true)
+              .then(function (success) {
+
+                console.info("SUCCESS WRITE",success);
+                $cordovaFile.readAsText(cordova.file.externalApplicationStorageDirectory, "files/repuestas.txt")
+                  .then(function (success) {
+                      console.info("SUCCESS READ FILE",success);
+                     var alertPopup = $ionicPopup.alert({
+                       title: 'Objeto JSON Guardado!',
+                       template: "Se creo el archivo correctamente"
+                     });
+                  }, function (error) {
+                      console.info("ERROR READ FILE",error);
+                      var alertPopup = $ionicPopup.alert({
+                       title: 'Error al Guardar JSON',
+                       template: error
+                     });
+                  });
+              }, function (error) {
+
+                console.info("ERROR WRITE",error);
+                
+              });
+
+          }, function (error) {
+
+            console.info("ERROR CHECK",error);
+     
+            $cordovaFile.createDir(cordova.file.externalApplicationStorageDirectory, "files", false)
+            .then(function (success) {
+
+              console.info("SUCCESS CREATE",success);
+              $cordovaFile.writeFile(cordova.file.externalApplicationStorageDirectory, "files/repuestas.txt", objJsonRespuestas, true)
+              .then(function (success) {
+
+                console.info("SUCCESS WRITE",success);
+                $cordovaFile.readAsText(cordova.file.externalApplicationStorageDirectory, "files/repuestas.txt")
+                  .then(function (success) {
+                      console.info("SUCCESS READ FILE",success);
+                   
+                     var alertPopup = $ionicPopup.alert({
+                       title: 'Objeto JSON Guardado!',
+                       template: success
+                     });
+                  }, function (error) {
+                      console.info("ERROR READ FILE",error);                  
+                      var alertPopup = $ionicPopup.alert({
+                       title: 'Error de JSON',
+                       template: error
+                     });
+                  });
+              }, function (error) {
+
+                console.info("ERROR WRITE",error);           
+
+              });
+
+            }, function (error) {
+
+              console.info("ERROR CREATE",error);
+            
+            });
+
+          });
+  };
+
   }else{
           $state.go("app.login");
         }
@@ -246,7 +364,7 @@ $ionicHistory.nextViewOptions({
    });
 
 })
-.controller('ProgramadorCtrl', function($scope,$ionicHistory,$cordovaInAppBrowser) {
+.controller('ProgramadorCtrl', function($scope,$ionicHistory,$cordovaInAppBrowser,$ionicPopup) {
   $ionicHistory.nextViewOptions({
     disableBack: true
   });
@@ -267,6 +385,47 @@ $ionicHistory.nextViewOptions({
   };
 
 })
+
+
+.controller('ArchivoCtrl', function($scope,$ionicHistory,$cordovaFile, $ionicPopup) {
+  $ionicHistory.nextViewOptions({
+    disableBack: true
+  });
+  $scope.respuestas;
+  $cordovaFile.checkDir(cordova.file.externalApplicationStorageDirectory, "files")
+    .then(function (success) {
+      console.info("SUCCESS CHECK DIR",success);
+      $cordovaFile.checkFile(cordova.file.externalApplicationStorageDirectory, "files/repuestas.txt")
+        .then(function (success) {
+          console.info("SUCCESS CHECK FILE",success);
+          $cordovaFile.readAsText(cordova.file.externalApplicationStorageDirectory, "files/repuestas.txt")
+            .then(function (success) {
+                console.info("SUCCESS READ FILE",success);
+                try {
+                var repuestaJson = JSON.parse(success);
+                var splitArray = repuestaJson.respuesta.split("-");
+                $scope.respuestas=splitArray;
+                }catch(error){
+                  $ionicPopup.alert({
+                       title: 'Error de JSON',
+                       template: error
+                     });
+                }
+                //for (var i = 0; i < splitArray.length; i++) {
+                 // splitArray[i];
+                //};
+            }, function (error) {
+                console.info("ERROR READ FILE",error);
+            });
+        }, function (error) {
+          console.info("ERROR CHECK FILE",error);
+        });
+    }, function (error) {
+      console.info("ERROR CHECK DIR",error);
+    });
+})
+
+
 .controller('FinCtrl', function($scope,$ionicHistory) {
   $ionicHistory.nextViewOptions({
     disableBack: true
